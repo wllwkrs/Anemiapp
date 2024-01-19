@@ -1,13 +1,25 @@
-import 'package:anemiapp/login.dart';
+import 'package:anemiapp/screen/login.dart';
+import 'package:anemiapp/services/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  Map<String, dynamic> errors = {};
+
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(child: Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
             horizontal: 20
@@ -39,7 +51,7 @@ class RegisterScreen extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.25),
@@ -53,7 +65,7 @@ class RegisterScreen extends StatelessWidget {
                   children: [
                     (
                         Padding(
-                            padding: EdgeInsets.symmetric(vertical: 20),
+                            padding: const EdgeInsets.symmetric(vertical: 20),
                             child: Text('Buat Akun',
                               style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontWeight: FontWeight.w700
@@ -61,7 +73,25 @@ class RegisterScreen extends StatelessWidget {
                             )
                         )),
                     TextFormField(
-                      decoration: const InputDecoration(
+                      controller: _nameController,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 10
+                        ),
+                        label: Text('Nama'),
+                          errorText: errors.containsKey('name') ? errors['name'][0] : null
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
@@ -70,11 +100,14 @@ class RegisterScreen extends StatelessWidget {
                             vertical: 10
                         ),
                         label: Text('E-mail'),
+                        errorText: errors.containsKey('email') ? errors['email'][0] : null
                       ),
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 20),
                     TextFormField(
-                      decoration: const InputDecoration(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
@@ -83,11 +116,13 @@ class RegisterScreen extends StatelessWidget {
                             vertical: 10
                         ),
                         label: Text('Password'),
+                          errorText: errors.containsKey('password') ? errors['password'][0] : null
                       ),
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 20),
                     TextFormField(
-                      decoration: const InputDecoration(
+                      obscureText: true,
+                      decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
@@ -98,27 +133,50 @@ class RegisterScreen extends StatelessWidget {
                         label: Text('Konfirmasi Password'),
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 30),
                     SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: FilledButton(
-                        onPressed: () {  },
-                        child: Text('Daftar'),
+                        onPressed: () async {
+                          Map<String, dynamic> data = {
+                            'name': _nameController.text,
+                            'email': _emailController.text,
+                            'password': _passwordController.text,
+                          };
+
+                          var res = await register(data);
+
+                          if(res['status'] == 201) {
+                            print('Berhasil');
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //   builder: (context) => const LoginScreen(),
+                            //   )
+                            // );
+                          } else {
+                            setState(() {
+                              errors = res['errors'];
+                              print(errors);
+                            });
+                          }
+                        },
+                        child: const Text('Daftar'),
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 20),
                     TextButton(
                         onPressed: () {
-                          Navigator.push(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const SafeArea(child: LoginScreen()),
+                              builder: (context) => const LoginScreen(),
                               )
-                          );
+                            );
                         },
                         child: RichText(
                           text: TextSpan(
-                              text: 'Sudah punya Akun ? ',
+                              text: 'Sudah punya Akun? ',
                               children: const [
                                 TextSpan(text: 'Masuk Sekarang',
                                     style: TextStyle(color: Colors.pinkAccent)
@@ -134,6 +192,6 @@ class RegisterScreen extends StatelessWidget {
             ]
         ),
       ),
-    );
+    ));
   }
 }

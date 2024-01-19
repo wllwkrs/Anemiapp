@@ -1,7 +1,8 @@
-import 'package:anemiapp/login.dart';
-import 'package:anemiapp/register.dart';
+import 'package:anemiapp/screen/login.dart';
+import 'package:anemiapp/screen/register.dart';
+import 'package:anemiapp/screen/survey.dart';
+import 'package:anemiapp/widget/main_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
             seedColor: Colors.pinkAccent
         )
       ),
-      home: const SafeArea(child: RegisterScreen()),
+      home: const SurveyScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
